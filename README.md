@@ -15,15 +15,19 @@ Aggregate results and methodology detail: [`public/report.txt`](public/report.tx
 Accuracy was unchanged. Single arm 0.528 and 0.556 across two replicates, chain
 arm 0.491 and 0.528. All four sit inside the same noise band.
 
-Refusals were not. The chain arm declined on 12 and 9 of 108 items versus 3 and 2
+Abstentions were not. The chain arm abstained on 12 and 9 of 108 items versus 3 and 2
 for the single arm, on items the single arm mostly answered normally. The
-refusals were scattered across replicates rather than concentrated on a stable
+abstentions were scattered across replicates rather than concentrated on a stable
 subset, so the effect is aggregate rather than per-item.
+
+An abstention here is the model selecting ProtocolQA's built-in "insufficient
+information to answer the question" choice, which the scorer counts as a
+non-answer. This is not a safety refusal.
 
 Reproducibility looks worse under the chain scaffold. Within-arm agreement across
 replicates was kappa 0.588 for single and 0.438 for chain, a gap of -0.150 with a
 95% bootstrap interval of [-0.356, 0.057]. The point estimate stays negative when
-refusals are excluded. The interval crosses zero, so this is suggestive and
+abstentions are excluded. The interval crosses zero, so this is suggestive and
 underpowered at n=108 rather than established.
 
 The four runs reported here are exploratory. A power analysis run afterward puts
@@ -50,8 +54,8 @@ else:
    would apply unchanged to a history or math benchmark; it isn't tuned to
    extract or elicit anything.
 3. **Aggregate rates only, in public.** This repo publishes accuracy,
-   agreement (Cohen's kappa), and refusal-rate statistics, plus per-item
-   *outcome labels* (correct/wrong/refusal, as plain categorical flags) for
+   agreement (Cohen's kappa), and abstention-rate statistics, plus per-item
+   *outcome labels* (correct/wrong/abstention, as plain categorical flags) for
    independent verification of those statistics. It does **not** publish raw
    model completions, sub-question text, or answer-choice text anywhere in
    this repo — see "What's excluded" below.
@@ -73,10 +77,10 @@ else:
 - `prepare_public_release.py` — strips free-text columns out of the local
   analysis CSVs to produce everything under `public/`.
 - `public/rows.csv`, `public/chain_refusal_detail.csv` — per-item outcome
-  labels only (arm, replicate, sample id, correct/wrong/refusal, boolean
+  labels only (arm, replicate, sample id, correct/wrong/abstention, boolean
   flags, sub-question counts). No question text, no answer text, no model
   output.
-- `public/report.txt` — the full aggregate report (accuracy, refusal rates,
+- `public/report.txt` — the full aggregate report (accuracy, abstention rates,
   within- and between-arm kappa with bootstrap confidence intervals).
 
 ## What's excluded
