@@ -1,14 +1,36 @@
-# scaffold-study
+# scaffold-sensitivity-protocolqa
 
 Does measured benchmark score depend on the scaffold around a model, not just
 the model itself? Two scaffolds (a plain single call vs. a decompose-into-
 sub-questions-then-recombine chain) run against the same model
-(`claude-haiku-4-5`) on the same 108-item academic benchmark
+(`claude-haiku-4-5`) on the same 108-item benchmark
 ([LAB-Bench ProtocolQA](https://arxiv.org/abs/2407.10362), FutureHouse Inc.),
 via Inspect AI (`inspect_evals`).
 
 Full design, rules, and provenance: [`CLAUDE.md`](CLAUDE.md).
 Aggregate results and methodology detail: [`public/report.txt`](public/report.txt).
+
+## Result
+
+Accuracy was unchanged. Single arm 0.528 and 0.556 across two replicates, chain
+arm 0.491 and 0.528. All four sit inside the same noise band.
+
+Refusals were not. The chain arm declined on 12 and 9 of 108 items versus 3 and 2
+for the single arm, on items the single arm mostly answered normally. The
+refusals were scattered across replicates rather than concentrated on a stable
+subset, so the effect is aggregate rather than per-item.
+
+Reproducibility looks worse under the chain scaffold. Within-arm agreement across
+replicates was kappa 0.588 for single and 0.438 for chain, a gap of -0.150 with a
+95% bootstrap interval of [-0.356, 0.057]. The point estimate stays negative when
+refusals are excluded. The interval crosses zero, so this is suggestive and
+underpowered at n=108 rather than established.
+
+The four runs reported here are exploratory. A power analysis run afterward puts
+a confirmatory study at 8 replicates per arm if the true gap matches the pilot
+estimate, and 18 if the true gap is 0.10. That figure is recorded in CLAUDE.md as
+a planning estimate. No confirmatory replicate count has been committed to and no
+confirmatory runs have been made.
 
 ## Safety commitments
 
