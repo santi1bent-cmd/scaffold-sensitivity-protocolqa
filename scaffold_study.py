@@ -88,14 +88,24 @@ def _parse_letter_answer(completion: str, num_choices: int) -> str | None:
 def _classify_answer(state: TaskState) -> tuple[bool, bool]:
     """Returns (parse_failure, declined_insufficient_info) for the model's final answer.
 
-    These are the two distinct ways a sample can end up NOANSWER-scored by
-    `precision_choice`, and they must not be conflated:
+    These are two distinct ways a sample can fail to be a clean answer, and
+    they must not be conflated:
       - parse_failure: the completion had no valid 'ANSWER: X' line at all.
       - declined_insufficient_info: it gave a valid letter, and that letter's
         choice text is "Insufficient information to answer the question" --
         a deliberate non-answer, not a formatting failure.
-    `refusal` (the field rule 4 asks for) is the OR of the two, which makes
-    it reconcile exactly with the `coverage` metric (coverage excludes both).
+    Only declined_insufficient_info actually scores NOANSWER in
+    `precision_choice`: that scorer's no-answer check requires a choice
+    marked correct=True whose value equals the no-answer sentinel, so a
+    parse_failure sample (no choice marked correct=True at all) falls
+    through to its CORRECT/INCORRECT comparison and scores INCORRECT, not
+    NOANSWER. `refusal` (the field rule 4 asks for) is still the OR of the
+    two -- that's a deliberate, broader definition than the scorer's own
+    NOANSWER -- but it only reconciles with the scorer's `coverage` metric
+    (which is keyed off NOANSWER) as long as parse_failure stays at zero.
+    That held for all 432 samples across the four completed runs, but is
+    not guaranteed for any future run: if parse_failure ever fires, `refusal`
+    will count it while `coverage` won't, and the two will diverge.
     """
     selected = [i for i, c in enumerate(state.choices) if c.correct is True]
     if not selected:
