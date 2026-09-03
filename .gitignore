@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+
+# Raw eval transcripts and unstripped analysis outputs contain per-item free
+# text (sub-questions, model completions, answer-choice text). Kept local
+# only -- see README.md "What's excluded". public/ is the sanitized subset
+# that's meant to be published.
+logs/
+analysis/

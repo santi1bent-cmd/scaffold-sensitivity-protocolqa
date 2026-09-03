@@ -1,0 +1,116 @@
+======================================================================
+BETWEEN-ARM AGREEMENT (single vs chain, matched by replicate)
+======================================================================
+replicate 1, outcome (correct/wrong/refusal): n=108  raw agreement=0.657  kappa=0.389
+replicate 1, refusal (yes/no):                n=108  raw agreement=0.861  kappa=-0.047
+replicate 2, outcome (correct/wrong/refusal): n=108  raw agreement=0.694  kappa=0.434
+replicate 2, refusal (yes/no):                n=108  raw agreement=0.935  kappa=0.344
+pooled across replicates, outcome:                    n=216  raw agreement=0.676  kappa=0.411
+pooled across replicates, refusal:                    n=216  raw agreement=0.898  kappa=0.121
+
+======================================================================
+WITHIN-ARM AGREEMENT (replicate 1 vs replicate 2, same arm) -- noise floor
+======================================================================
+single arm, outcome (correct/wrong/refusal): n=108  raw agreement=0.787  kappa=0.588
+single arm, refusal (yes/no):                n=108  raw agreement=0.972  kappa=0.386
+ chain arm, outcome (correct/wrong/refusal): n=108  raw agreement=0.676  kappa=0.438
+ chain arm, refusal (yes/no):                n=108  raw agreement=0.880  kappa=0.316
+
+======================================================================
+IS THE WITHIN-ARM KAPPA GAP REAL, OR SAMPLING ERROR? (item-paired bootstrap, n_boot=5000, seed=20260903)
+======================================================================
+The two arms cover the same 108 items, so each bootstrap draw resamples item
+indices ONCE and applies that same resample to both arms -- this lets the
+difference isolate 'chain is less reproducible than single' from ordinary
+item-sampling noise, rather than comparing two independently-noisy intervals.
+single within-arm kappa: 0.588  95% CI [0.431, 0.733]
+ chain within-arm kappa: 0.438  95% CI [0.284, 0.580]
+difference (chain - single): -0.150  95% CI [-0.356, 0.057]
+-> includes 0 -> NOT distinguishable from sampling error at 95%
+
+======================================================================
+DOES THE GAP SURVIVE EXCLUDING REFUSALS? (items both replicates answered)
+======================================================================
+Restricting each arm to items where NEITHER replicate refused. This changes
+the item set independently per arm (chain excludes more items, since it
+refuses more) -- so unlike the paired test above, the two kappas below no
+longer describe the same items, and the difference CI is an ordinary
+independent-samples bootstrap, not a matched-pairs one.
+single arm: n=104  raw agreement=0.808  kappa=0.610  95% CI [0.446, 0.752]  (4 items excluded for a refusal in either replicate)
+ chain arm: n=91  raw agreement=0.758  kappa=0.507  95% CI [0.317, 0.685]  (17 items excluded for a refusal in either replicate)
+difference (chain - single) on refusal-free items: -0.104  95% CI [-0.345, 0.142]  (independent-samples bootstrap)
+-> includes 0 -> gap not distinguishable from sampling error once refusals are excluded
+
+======================================================================
+REFUSAL RATE AND DECOMPOSITION FAILURES
+======================================================================
+ chain arm, replicate 1: refusals 12/108 (11.1%)   decomposition fallbacks 0/108
+ chain arm, replicate 2: refusals 9/108 (8.3%)   decomposition fallbacks 0/108
+single arm, replicate 1: refusals 3/108 (2.8%)   decomposition fallbacks 0/108
+single arm, replicate 2: refusals 2/108 (1.9%)   decomposition fallbacks 0/108
+
+======================================================================
+CHAIN-ARM REFUSALS: what did the single arm do on the same item?
+======================================================================
+replicate 1: chain refused on 12/108 items. On those same items, single arm was:
+    correct: 5
+    wrong: 7
+replicate 2: chain refused on 9/108 items. On those same items, single arm was:
+    correct: 3
+    wrong: 4
+    refusal/declined: 2
+
+======================================================================
+ARE CHAIN-ARM REFUSALS THE SAME ITEMS ACROSS REPLICATES, OR SCATTERED?
+======================================================================
+replicate 1 refused: 12   replicate 2 refused: 9
+refused in BOTH replicates (same item, same run's independent sample): 4
+refused in EITHER replicate (union): 17
+overlap / union (Jaccard): 0.235
+of replicate 1's refusals, fraction that recur in replicate 2: 0.333
+of replicate 2's refusals, fraction that recur in replicate 1: 0.444
+
+======================================================================
+DOES THE REFUSAL COME FROM A SUB-QUESTION OR FROM RECOMBINATION?
+======================================================================
+Caveat: sub-questions are free-text with no pass/fail parsing, so there is
+no formal 'this sub-question refused' signal to read off directly. This is a
+heuristic: does at least one of the item's stored sub-answers contain
+hedging language ("insufficient information", "cannot determine", etc.)?
+'hedged' means a sub-answer already looked uncertain before recombination;
+'clean' means all sub-answers read as substantive and the decline happened
+only at the final, recombination step.
+across both replicates' 21 chain refusals: 0 had a hedged sub-answer, 21 were clean (recombination-only decline)
+  replicate 1: 0/12 hedged
+  replicate 2: 0/9 hedged
+
+======================================================================
+SUMMARY TABLE (for the writeup)
+======================================================================
+
+Per run:
+
+| Arm | Rep | Accuracy (95% CI) | Refusal rate (95% CI) |
+|---|---|---|---|
+| chain | 1 | 0.491 [0.396, 0.585] | 0.111 (12/108) [0.065, 0.184] |
+| chain | 2 | 0.528 [0.433, 0.622] | 0.083 (9/108) [0.044, 0.151] |
+| single | 1 | 0.528 [0.433, 0.622] | 0.028 (3/108) [0.009, 0.079] |
+| single | 2 | 0.556 [0.461, 0.650] | 0.019 (2/108) [0.005, 0.065] |
+
+Agreement (Cohen's kappa, item-level, on correct/wrong/refusal outcome):
+
+| Comparison | n | kappa | 95% CI |
+|---|---|---|---|
+| Within-arm, single (rep1 vs rep2) | 108 | 0.588 | [0.431, 0.733] |
+| Within-arm, chain (rep1 vs rep2) | 108 | 0.438 | [0.284, 0.580] |
+| Within-arm difference (chain - single) | 108 | -0.150 | [-0.356, 0.057] |
+| Within-arm, single, refusal-free items only | 104 | 0.610 | [0.446, 0.752] |
+| Within-arm, chain, refusal-free items only | 91 | 0.507 | [0.317, 0.685] |
+| Within-arm difference, refusal-free (chain - single) | n varies | -0.104 | [-0.345, 0.142] |
+| Between-arm, replicate 1 | 108 | 0.389 | [0.243, 0.528] |
+| Between-arm, replicate 2 | 108 | 0.434 | [0.268, 0.584] |
+| Between-arm, pooled | 216 | 0.411 | [0.309, 0.522] |
+
+(All intervals: percentile bootstrap, n_boot=5000, seed=20260903, except accuracy which uses Inspect's own stderr x 1.96, and refusal rate which uses a Wilson score interval.)
+
+Wrote analysis\rows.csv (432 rows) and analysis\chain_refusal_detail.csv (21 rows).
