@@ -475,20 +475,23 @@ def main() -> None:
     emit("")
     emit("Per run:")
     emit("")
-    emit("| Arm | Rep | Accuracy (95% CI) | Refusal rate (95% CI) |")
-    emit("|---|---|---|---|")
+    emit("| Arm | Rep | Accuracy, all items (95% CI) [n=108] | Accuracy, answered-only (precision metric) [n=answered] | Refusal rate (95% CI) |")
+    emit("|---|---|---|---|---|")
     for (arm_name, replicate), (_p, log) in sorted(found.items()):
         arm = "single" if arm_name == "single_arm" else "chain"
         sc = log.results.scores[0]
         acc = sc.metrics["accuracy"].value
         acc_se = sc.metrics["stderr"].value
         acc_lo, acc_hi = acc - 1.96 * acc_se, acc + 1.96 * acc_se
+        precision = sc.metrics["precision"].value
         n = len(idx[(arm, replicate)])
         refusals = sum(1 for r in idx[(arm, replicate)].values() if r["refusal"])
+        answered = n - refusals
         ref_rate = refusals / n
         ref_lo, ref_hi = wilson_ci(refusals, n)
         emit(
             f"| {arm} | {replicate} | {acc:.3f} [{acc_lo:.3f}, {acc_hi:.3f}] | "
+            f"{precision:.3f} (n={answered}) | "
             f"{ref_rate:.3f} ({refusals}/{n}) [{ref_lo:.3f}, {ref_hi:.3f}] |"
         )
 
@@ -528,7 +531,8 @@ def main() -> None:
     emit("")
     emit(f"(All intervals: percentile bootstrap, n_boot={N_BOOT}, seed={BOOTSTRAP_SEED}, "
          "except accuracy which uses Inspect's own stderr x 1.96, and refusal rate "
-         "which uses a Wilson score interval.)")
+         "which uses a Wilson score interval. Answered-only accuracy (the precision "
+         "metric) is reported as a point estimate with no interval.)")
 
     emit("")
     emit(f"Wrote {OUT_DIR / 'rows.csv'} ({len(rows)} rows) and "
