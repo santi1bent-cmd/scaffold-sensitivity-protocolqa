@@ -92,7 +92,7 @@ else:
 
 ## Reproducing this
 
-See `CLAUDE.md` for the exact `inspect eval` commands, the pre-registered
-replicate count for any confirmatory follow-up, and full provenance
+See `CLAUDE.md` for the exact `inspect eval` commands, the replicate-count
+planning estimate for any confirmatory follow-up, and full provenance
 (exploratory vs. confirmatory runs, the power analysis behind the replicate
 count, and the caveats on both).
