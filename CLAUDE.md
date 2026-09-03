@@ -32,8 +32,16 @@ disagreement between arms means anything.
 7. Replicates need independent sampling. Not temperature 0, and turn response
    caching OFF for replicates (`--cache` omitted). Leave caching ON while
    debugging (`--cache`).
-8. ProtocolQA is multiple choice with 5 options, so chance is 0.20. Report
-   Cohen's kappa alongside raw agreement. Keep the raw numbers too.
+8. ProtocolQA's option count is not fixed at 5 -- it varies by item, so
+   chance is item-dependent, not a flat 0.20. `record_to_sample_protocolqa`
+   builds each item's choices as `[ideal] + distractors + [UNCERTAIN_ANSWER_CHOICE]`,
+   i.e. `len(distractors) + 2` options; `inspect_evals` does not pad or trim
+   this to a fixed width. Verified against the 108-item public ProtocolQA
+   source data (`Future-House/lab-bench`, `ProtocolQA/protocolqa-v1-public.jsonl`):
+   5 options (3 distractors) for 77 items, 6 (4 distractors) for 21, 7 (5
+   distractors) for 9, 8 (6 distractors) for 1. Item-weighted mean chance is
+   approximately 0.188, not 0.20. Report Cohen's kappa alongside raw
+   agreement. Keep the raw numbers too.
 
 ## Analysis output needed (once the full study runs)
 
