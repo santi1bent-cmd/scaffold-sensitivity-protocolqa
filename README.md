@@ -51,11 +51,12 @@ else:
    content — the model is only ever asked to answer or decompose questions
    that were already public before this project started.
 2. **Generic decomposition prompts.** The "chain" scaffold's decomposition
-   step (`scaffold_study.py`) is a domain-agnostic instruction — "break this
-   multiple-choice question into up to 3 self-contained sub-questions" — with
-   nothing biology-specific or hazard-specific in it. The identical prompt
-   would apply unchanged to a history or math benchmark; it isn't tuned to
-   extract or elicit anything.
+   step (`_decompose_template` in `scaffold_study.py`) is a domain-agnostic
+   instruction — "break it into at most 3 sub-questions whose answers would
+   help you solve it," with a rule that "each sub-question must stand
+   entirely on its own." Nothing in it is biology-specific or
+   hazard-specific: the identical prompt would apply unchanged to a history
+   or math benchmark; it isn't tuned to extract or elicit anything.
 3. **Aggregate rates only, in public.** This repo publishes accuracy,
    agreement (Cohen's kappa), and abstention-rate statistics, plus per-item
    *outcome labels* (correct/wrong/abstention, as plain categorical flags) for
