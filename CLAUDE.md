@@ -6,9 +6,11 @@ Same 108 questions, same model (`claude-haiku-4-5`), two setups. Question: does
 the score depend on the scaffold rather than the model?
 
 - **Arm "single"** — plain single call, just `generate()`.
-- **Arm "chain"** — the model breaks the question into 2 to 3 sub-questions,
-  answers each one in a FRESH context with no memory of the others, then reads
-  those answers and picks a final answer to the original question.
+- **Arm "chain"** — the model breaks the question into up to 3 sub-questions
+  (always exactly 3 in the completed runs -- `num_subquestions` is 3 for all
+  216 chain-arm rows in `public/rows.csv`, zero variance), answers each one in
+  a FRESH context with no memory of the others, then reads those answers and
+  picks a final answer to the original question.
 
 Note: "fresh context" here means fresh *between sub-questions within one
 item*, not between items. Every item is independent in both arms, as Inspect
@@ -58,7 +60,9 @@ $20 hard cap. `epochs=1`. Warn before any run over $5.
 ## Status
 
 - Baseline measured: single arm scores 0.467 on a 30-item slice (stderr
-  0.093), vs. 0.20 chance.
+  0.093). Chance here is item-dependent, not a flat 0.20 -- see rule 8
+  (item-weighted mean ~0.188 across the full 108-item set; the chance rate
+  for this particular 30-item slice was not separately computed).
 - Implementation: `scaffold_study.py` (both arms, self-contained, reuses the
   `inspect_evals` LAB-Bench ProtocolQA dataset/scorer).
 - **The 4-run study (single x2, chain x2, 108 items each) is DONE (2026-09-03)

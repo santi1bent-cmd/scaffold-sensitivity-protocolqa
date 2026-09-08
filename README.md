@@ -27,7 +27,10 @@ non-answer. This is not a safety refusal.
 Reproducibility looks worse under the chain scaffold. Within-arm agreement across
 replicates was kappa 0.588 for single and 0.438 for chain, a gap of -0.150 with a
 95% bootstrap interval of [-0.356, 0.057]. The point estimate stays negative when
-abstentions are excluded. The interval crosses zero, so this is suggestive and
+abstentions are excluded, but that comparison drops different items per arm
+(single n=104, chain n=91, since chain abstains more), so its interval is an
+independent-samples bootstrap rather than the item-paired one behind the
+headline -0.150. The interval crosses zero, so this is suggestive and
 underpowered at n=108 rather than established.
 
 The four runs reported here are exploratory. A power analysis run afterward puts
