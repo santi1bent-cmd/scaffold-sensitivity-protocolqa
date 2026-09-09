@@ -114,6 +114,16 @@ def _classify_answer(state: TaskState) -> tuple[bool, bool]:
     return False, declined
 
 
+# retrieve_hf_dataset's defaults are shuffle_dataset=True, shuffle_choices=True,
+# both unseeded -- so every run of the four completed runs drew its own fresh,
+# uncontrolled permutation of each item's answer options. This doesn't bias
+# scoring: inspect_ai's shuffle_choices remaps the sample's target letter to
+# match the new position, so correctness is judged against the same choice
+# regardless of where it landed. But it does mean option order was an
+# uncontrolled per-run factor across those four runs. A confirmatory phase
+# must pass an explicit integer seed to shuffle_choices (e.g. via
+# retrieve_hf_dataset's shuffle_choices parameter) so option order is
+# reproducible and comparable across replicates.
 def _protocolqa_dataset():
     return retrieve_hf_dataset(DatasetSubsets.ProtocolQA.value, record_to_sample_protocolqa)
 
@@ -201,9 +211,13 @@ def decompose_and_answer(max_subquestions: int = 3, replicate: int = 1) -> Solve
 
         # Stage 3: final answer. This is the one call that goes through the
         # harness `generate()`, using the exact same prompt template and
-        # 'ANSWER: $LETTER' instructions as the single arm -- so the only
-        # thing that differs between arms is whether a research digest got
-        # prepended to the question, not how the final answer is elicited.
+        # 'ANSWER: $LETTER' instructions as the single arm -- so the
+        # elicitation of the final answer is identical across arms. That
+        # does NOT mean the two arms see identical prompts for a given item:
+        # per-run reshuffling of choice order (see _protocolqa_dataset) means
+        # the single and chain arms see that item's options in different
+        # orders whenever their reshuffles differ, independent of anything
+        # this stage does.
         state.user_prompt.text = state.choices.prompt(final_question, MULTIPLE_CHOICE_TEMPLATE)
         state = await generate(state)
 
@@ -237,7 +251,10 @@ def single_arm(replicate: int = 1) -> Task:
     return Task(
         dataset=_protocolqa_dataset(),
         solver=[
-            multiple_choice(template=MULTIPLE_CHOICE_TEMPLATE, cot=True),
+            # cot=True is dropped: inspect_ai's multiple_choice() ignores `cot`
+            # whenever a custom `template` is given, and MULTIPLE_CHOICE_TEMPLATE
+            # already contains "Think step by step."
+            multiple_choice(template=MULTIPLE_CHOICE_TEMPLATE),
             tag_single_arm(replicate=replicate),
         ],
         scorer=precision_choice(no_answer=UNCERTAIN_ANSWER_CHOICE),

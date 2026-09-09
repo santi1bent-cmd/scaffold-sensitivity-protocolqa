@@ -31,7 +31,12 @@ disagreement between arms means anything.
 6. Same model in both arms.
 7. Replicates need independent sampling. Not temperature 0, and turn response
    caching OFF for replicates (`--cache` omitted). Leave caching ON while
-   debugging (`--cache`).
+   debugging (`--cache`). Option order is another uncontrolled per-run factor:
+   `_protocolqa_dataset()` shuffles choices unseeded by default, so the four
+   completed runs each drew their own random permutation (this doesn't bias
+   scoring -- Inspect remaps the target letter -- but it means option order
+   wasn't held constant across replicates). A confirmatory phase must pass an
+   explicit integer seed to `shuffle_choices`.
 8. ProtocolQA's option count is not fixed at 5 -- it varies by item, so
    chance is item-dependent, not a flat 0.20. `record_to_sample_protocolqa`
    builds each item's choices as `[ideal] + distractors + [UNCERTAIN_ANSWER_CHOICE]`,
@@ -135,10 +140,10 @@ inspect eval scaffold_study.py@chain_arm --model anthropic/claude-haiku-4-5-2025
 inspect view --log-dir logs
 
 # analyze completed logs (agreement, kappa, refusal breakdown)
-.venv/Scripts/python.exe analyze_study.py
+python analyze_study.py
 
 # power analysis for planning additional replicates (no eval run)
-.venv/Scripts/python.exe power_analysis.py
+python power_analysis.py
 ```
 
 Note: `-M` is for provider-client constructor args, not sampling params — it
@@ -147,7 +152,7 @@ errors on `temperature`. Use the top-level `--temperature` flag.
 - `-T replicate=N` stamps the replicate number into every sample's
   `state.store` and into the log's `task_args`, so a run is labeled in the
   log data itself -- not just distinguished by filename/timestamp.
-- `-M temperature=1` is pinned explicitly rather than relying on the
+- `--temperature 1` is pinned explicitly rather than relying on the
   provider's default. Verified (2026-09-03): with temperature unset, Inspect
   sends no `temperature` field to Anthropic at all and the API's own default
   (1.0) applies -- not 0 -- but that's true only by absence of a setting, so

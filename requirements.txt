@@ -1,0 +1,5 @@
+# Exact versions should be pinned from the eval logs' `packages` metadata
+# (each .eval log records the inspect_ai/inspect_evals versions it was run
+# with). Unpinned here because those logs are not part of this repo.
+inspect-ai
+inspect-evals

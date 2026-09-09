@@ -68,6 +68,11 @@ else:
 
 ## What's in this repo
 
+- **Naming:** the write-up and this README say "abstention"; the code field,
+  the `refusal` column in `public/rows.csv`, `public/report.txt`, and
+  `CLAUDE.md` rule 4 say "refusal". These are the same field — the model
+  selecting ProtocolQA's built-in "Insufficient information to answer the
+  question" choice — under two names. Nothing here measures safety refusal.
 - `scaffold_study.py` — the two Inspect AI tasks (`single_arm`, `chain_arm`).
 - `analyze_study.py` — agreement/kappa analysis over completed eval logs.
 - `power_analysis.py` — replicate-count planning from pilot data (see
@@ -96,7 +101,34 @@ else:
 
 ## Reproducing this
 
-See `CLAUDE.md` for the exact `inspect eval` commands, the replicate-count
-planning estimate for any confirmatory follow-up, and full provenance
-(exploratory vs. confirmatory runs, the power analysis behind the replicate
-count, and the caveats on both).
+The local eval logs and analysis outputs (`logs/`, `analysis/`) that
+`analyze_study.py` and `power_analysis.py` depend on are not part of this
+repo. To independently verify the published statistics without them, run
+`verify_public.py` — it recomputes accuracy, precision, coverage,
+abstention rates, within- and between-arm Cohen's kappa, and the paired
+bootstrap difference and CI directly from `public/rows.csv`, using only the
+Python standard library, and asserts the results against known-good values.
+
+To reproduce the study itself from scratch, see `CLAUDE.md` for the exact
+`inspect eval` commands, the replicate-count planning estimate for any
+confirmatory follow-up, and full provenance (exploratory vs. confirmatory
+runs, the power analysis behind the replicate count, and the caveats on
+both).
+
+Note: the write-up's figures (tables, prose statistics) were generated
+outside this repo; this repo provides the code and data to reproduce them,
+not the write-up itself.
+
+## Attribution and licensing
+
+- The code in this repo is licensed under MIT (see `LICENSE`).
+- It is built on [`inspect_evals`](https://github.com/UKGovernmentBEIS/inspect_evals)
+  (UK AI Security Institute), also MIT-licensed.
+- It uses [LAB-Bench ProtocolQA](https://arxiv.org/abs/2407.10362) (Laurent et
+  al., 2024; FutureHouse Inc.), distributed under CC-BY-SA-4.0.
+- The derived per-item outcome labels published in `public/` (correct/wrong/
+  abstention flags, sub-question counts, and similar bookkeeping — no
+  question, answer, or protocol text) are shared under the same CC-BY-SA-4.0
+  terms as the underlying benchmark.
+- No LAB-Bench question, answer, or protocol text is reproduced anywhere in
+  this repo — see "What's excluded" above.
