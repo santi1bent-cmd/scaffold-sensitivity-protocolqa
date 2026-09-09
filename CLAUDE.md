@@ -102,9 +102,11 @@ $20 hard cap. `epochs=1`. Warn before any run over $5.
     observed replicate-pair (SE=0.106, n=108 items), extrapolated by
     treating additional replicate-pairs as independent, equally-noisy
     repeats and averaging (variance shrinks as 1/P, the standard result for
-    averaging independent unbiased estimates). Deliberately the more
-    conservative of two methods tried — a per-item multi-rater (Fleiss'
-    kappa) simulation was attempted first and abandoned because it implied a
+    averaging independent unbiased estimates). Note: this scaling is wrong.
+    The bootstrap SE is item-level, so it does not shrink across
+    replicate-pairs on the same 108 items. Read 8/18/72 as a floor on the
+    replicates needed, not a conservative estimate. A per-item multi-rater
+    (Fleiss' kappa) simulation was attempted first and abandoned because it implied a
     smaller effective effect size (~0.075, half the pilot estimate), an
     artifact of resampling from only 2 pilot draws per item. See
     `power_analysis.py`'s module docstring for why.
