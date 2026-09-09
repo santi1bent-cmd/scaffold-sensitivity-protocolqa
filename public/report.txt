@@ -1,3 +1,11 @@
+NOTE (2026-09-09): This file predates commit cb2dac7, which added an
+answered-only precision column to analyze_study.py's summary table; that
+column is missing below. This file is not regenerated (see README.md --
+prepare_public_release.py and the local logs/analysis outputs it depends
+on are deliberately absent from this repo). For the current metric set
+computed directly from public/rows.csv, including the missing precision
+figures, see verify_public.py.
+
 ======================================================================
 BETWEEN-ARM AGREEMENT (single vs chain, matched by replicate)
 ======================================================================

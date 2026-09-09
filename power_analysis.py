@@ -28,11 +28,16 @@ unbiased estimators): SE_diff(P pairs) = SE_2 / sqrt(P), where SE_2 is the
 already-computed item-level bootstrap SE of the kappa difference from our
 one real replicate-pair. R = 2 * P total replicates per arm.
 
-This is more conservative (asks for somewhat more replicates) than the
-abandoned per-item simulation, precisely because it doesn't lean on Fleiss'
-kappa's more sample-efficient use of all replicates jointly -- it only
-credits independent, non-overlapping pairs. That conservatism is the point:
-it doesn't require trusting an assumption this pilot can't check.
+Caveat: SE_2 (se_one_pair below) comes from bootstrap_paired_two_kappas,
+which resamples ITEMS while holding each item's observed replicate-1/
+replicate-2 outcome pair fixed. That's an item-level SE from the one
+replicate-pair we have; it says nothing about how much noisier or quieter
+a *different* replicate-pair would be, so SE_2/sqrt(P) does not actually
+model the variance reduction from collecting P independent replicate-pairs
+-- it's a lower bound on that SE, not an estimate of it, because it carries
+no information about pair-to-pair variability. The resulting replicate
+counts (8/18/72 below) are therefore a floor on what a confirmatory phase
+would need, not a conservative (i.e. safely-more-than-enough) estimate.
 """
 
 import math
@@ -73,7 +78,7 @@ def main() -> None:
 
     _, k_single, n = cohens_kappa(single_pairs)
     _, k_chain, _ = cohens_kappa(chain_pairs)
-    observed_diff = k_single - k_chain
+    observed_diff = k_chain - k_single
 
     ka_boot, kb_boot, diff_boot = bootstrap_paired_two_kappas(single_pairs, chain_pairs)
     mean_diff = sum(diff_boot) / len(diff_boot)
@@ -84,7 +89,7 @@ def main() -> None:
     print("=" * 70)
     print(f"single within-arm kappa (R=2): {k_single:.3f}")
     print(f" chain within-arm kappa (R=2): {k_chain:.3f}")
-    print(f"observed difference:           {observed_diff:.3f}")
+    print(f"observed difference (chain - single): {observed_diff:.3f}")
     print(f"bootstrap SE of that difference, from ONE replicate-pair (n={n} items): {se_2:.4f}")
 
     print()
@@ -92,17 +97,17 @@ def main() -> None:
     print(f"REPLICATES NEEDED FOR {TARGET_POWER:.0%} POWER (alpha=0.05, two-sided)")
     print("=" * 70)
     print(f"{'assumed true diff':>20} {'pairs needed (P)':>18} {'replicates/arm (R=2P)':>22} {'power at that R':>16}")
-    for label, delta in (("0.15 (pilot estimate)", 0.15), ("0.10 (conservative)", 0.10), ("0.05 (very conservative)", 0.05)):
-        p = pairs_needed(se_2, delta)
+    for label, delta in (("0.15 (pilot estimate)", abs(observed_diff)), ("0.10 (conservative)", 0.10), ("0.05 (very conservative)", 0.05)):
+        p = pairs_needed(se_2, abs(delta))
         r = 2 * p
         se_at_p = se_2 / (p**0.5)
-        power = power_for_se(se_at_p, delta)
+        power = power_for_se(se_at_p, abs(delta))
         print(f"{label:>20} {p:>18} {r:>22} {power:>16.3f}")
 
     print()
     print("Headline: assuming the true gap really is the pilot's 0.15, "
-          f"{2 * pairs_needed(se_2, 0.15)} replicates per arm "
-          f"({pairs_needed(se_2, 0.15)} independent pairs) reach {TARGET_POWER:.0%} power.")
+          f"{2 * pairs_needed(se_2, abs(observed_diff))} replicates per arm "
+          f"({pairs_needed(se_2, abs(observed_diff))} independent pairs) reach {TARGET_POWER:.0%} power.")
     print()
     print("Caveats:")
     print("- The 0.15 assumed effect is itself a point estimate from a 2-replicate pilot")
@@ -119,6 +124,10 @@ def main() -> None:
     print("- R must be even for this pairing method to use every replicate; an odd R")
     print("  wastes one replicate for THIS projection, though the eventual real analysis")
     print("  can still use every replicate jointly once collected.")
+    print("- SE_2 is an item-level bootstrap SE from the ONE replicate-pair we have; it")
+    print("  carries no information about pair-to-pair variability, so SE_2/sqrt(P) is a")
+    print("  lower bound on the SE of P replicate-pairs, not an estimate of it. The 8/18/72")
+    print("  replicate counts above are a floor, not a conservative (extra-safe) estimate.")
 
 
 if __name__ == "__main__":
